@@ -104,10 +104,32 @@ class Searchbox {
     }
   }
 
+  // If a node that isn't the last node is the value, return false.
+  private isInputValueAtEnd(): boolean {
+    for (let i = 0; i < this._sb.childNodes.length - 1; i++) {
+      if (this._sb.childNodes[i].nodeType === 3) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private onInput(_: Event) {
-    this.updateInputValue();
-    this.ensureSbHasContent();
     let val = this.getCurrentSbText();
+    // If the user hit delete when in the sentinel textnode, we would end up
+    // with and empty text node. In this case we should remove the last child
+    // that's a span, if there is one and then call ensureSbHasContent().
+    if (this.isInputValueAtEnd() && !val) {
+      for (let i = this._sb.childNodes.length - 1; i >= 0; i--) {
+        let node = this._sb.childNodes[i];
+        if (node.nodeName == 'SPAN') {
+          node.parentNode!.removeChild(node);
+          break;
+        }
+      }
+      this.ensureSbHasContent();
+    }
+    this.updateInputValue();
     // Close any already open lists of autocompleted values.
     this.closeList();
     // If the val is the empty string, then we have nothing to do.
@@ -125,7 +147,7 @@ class Searchbox {
         ourValue = ourValue.toLowerCase();
         matchValue = matchValue.toLowerCase();
       }
-      if (matchValue.indexOf(ourValue) > -1) {
+      if (ourValue && matchValue.indexOf(ourValue) > -1) {
         // Create a div for each match.
         let entry = document.createElement("div");
         /*make the matching letters bold:*/
