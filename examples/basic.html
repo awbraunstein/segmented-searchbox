@@ -12,6 +12,38 @@
 	     padding: 40px 0;
 	 }
 	</style>
+	<script>
+	 let sbconf = {
+	     valueKinds: [
+		 {
+		     name: 'keywords',
+		     color: 'blue',
+		     values: [
+			 {data: 'OR'},
+			 {data: 'AND'},
+		     ]
+		 }, {
+		     name: 'special-character',
+		     color: 'green',
+		     values: [
+			 {data: '('},
+			 {data: ')'}
+		     ]
+		 }, {
+		     name: 'songs',
+		     color: 'red',
+		     values: [
+			 {data: 'you-enjoy-myself',
+			  text: 'You Enjoy Myself'},
+			 {data: 'brian-and-robert',
+			  text: 'Brian and Robert'},
+			 {data: 'reba',
+			  text: 'Reba'}
+		     ]
+		 }
+	     ]
+	 }
+	</script>
     </head>
     <body>
 	<div class="control-group">
@@ -19,36 +51,17 @@
 	    <input type="text" id="basic-searchbox" class="demo-default">
 	    <script>
 	     var el = document.getElementById('basic-searchbox');
-	     SegmentedSearchbox.initSearchbox(el, {
-		 valueKinds: [
-		     {
-			 name: 'keywords',
-			 color: 'blue',
-			 values: [
-			     {data: 'OR'},
-			     {data: 'AND'},
-			 ]
-		     }, {
-			 name: 'special-character',
-			 color: 'green',
-			 values: [
-			     {data: '('},
-			     {data: ')'}
-			 ]
-		     }, {
-			 name: 'songs',
-			 color: 'red',
-			 values: [
-			     {data: 'you-enjoy-myself',
-			      text: 'You Enjoy Myself'},
-			     {data: 'brian-and-robert',
-			      text: 'Brian and Robert'},
-			     {data: 'reba',
-			      text: 'Reba'}
-			 ]
-		     }
-		 ]
-	     });
+	     SegmentedSearchbox.initSearchbox(el, sbconf);
+	    </script>
+	</div>
+	<div class="control-group">
+	    <label for="searchbox-from-value">Search:</label>
+	    <input type="text" id="searchbox-from-value" class="demo-default"
+		   value="reba AND brian-and-robert OR ( you-enjoy-myself AND
+			 reba )">
+	    <script>
+	     var el = document.getElementById('searchbox-from-value');
+	     SegmentedSearchbox.initSearchbox(el, sbconf);
 	    </script>
 	</div>
     </body>

@@ -4,6 +4,11 @@ interface LookupValue {
   ignoreCase: boolean;
 }
 
+interface ReverseLookupValue {
+  color: string;
+  text: string;
+}
+
 class Searchbox {
 
   private _el: HTMLInputElement;
@@ -82,6 +87,17 @@ class Searchbox {
     }
   }
 
+  private createSpanForSb(text: string, color: string, value: string):
+    HTMLSpanElement {
+    var span = document.createElement('span');
+    span.classList.add('segmented-searchbox-valid-item')
+    span.textContent = text;
+    span.style.backgroundColor = color;
+    span.dataset['value'] = value;
+    span.contentEditable = 'false';
+    return span;
+  }
+
   // Inserts a valid value into the searchbox. This makes that value uneditable
   // and colors it appropriately.
   private insertValueIntoSb(el: HTMLElement) {
@@ -89,12 +105,9 @@ class Searchbox {
       let node = this._sb.childNodes[i];
       // If the node is a textnode, then we should replace it.
       if (node.nodeType === 3) {
-        var replacement = document.createElement('span');
-        replacement.classList.add('segmented-searchbox-valid-item')
-        replacement.textContent = el.dataset['text'] || '';
-        replacement.style.backgroundColor = el.dataset['color'] || '';
-        replacement.dataset['value'] = el.dataset['value'];
-        replacement.contentEditable = 'false';
+        var replacement = this.createSpanForSb(el.dataset['text'] || '',
+          el.dataset['color'] || '',
+          el.dataset['value'] || '');
         node.parentNode!.insertBefore(replacement, node);
         node.parentNode!.removeChild(node);
         this.ensureSbHasContent();
@@ -242,9 +255,42 @@ class Searchbox {
 
     // Make the searchbox contenteditable.
     this._sb.contentEditable = 'true';
+
+    this.renderFromInputValue();
+
     this._sb.addEventListener('input', (e) => { this.onInput(e); });
     this._sb.addEventListener('keydown', (e) => { this.onKeydown(e); });
 
+  }
+
+  // If the input has a value to start with, we should render that first.
+  private renderFromInputValue() {
+    let val = this._el.value;
+    if (!val) {
+      return;
+    }
+
+    let reverseLookup: { [value: string]: ReverseLookupValue; } = {};
+    for (let text in this._lookup) {
+      let lv = this._lookup[text];
+      reverseLookup[lv.data] = {
+        color: lv.color,
+        text: text
+      };
+    }
+    let queryPieces = val.split(/\s+/);
+    for (let piece of queryPieces) {
+      if (!(piece in reverseLookup)) {
+        // This is an error.
+        console.log('Query part: ' + piece + ' is invalid.');
+        return;
+      }
+      let rl = reverseLookup[piece];
+      let span = this.createSpanForSb(rl.text, rl.color, piece);
+      this._sb.appendChild(span);
+    }
+    this.updateInputValue();
+    this.ensureSbHasContent();
   }
 
   private createLookup(config: SearchboxConfig): { [text: string]: LookupValue; } {
