@@ -50,6 +50,15 @@ var Searchbox = (function () {
         }
         this._el.value = vals.join(' ');
     };
+    Searchbox.prototype.ensureSbHasContent = function () {
+        var len = this._sb.childNodes.length;
+        if (len != 0 && this._sb.childNodes[len - 1].nodeType != 3) {
+            var node = document.createTextNode('\u00a0');
+            this._sb.appendChild(node);
+            this._sb.focus();
+            document.getSelection().collapse(node, 1);
+        }
+    };
     Searchbox.prototype.insertValueIntoSb = function (el) {
         for (var i = 0; i < this._sb.childNodes.length; i++) {
             var node = this._sb.childNodes[i];
@@ -62,12 +71,15 @@ var Searchbox = (function () {
                 replacement.contentEditable = 'false';
                 node.parentNode.insertBefore(replacement, node);
                 node.parentNode.removeChild(node);
+                this.ensureSbHasContent();
+                this.updateInputValue();
+                return;
             }
         }
-        this.updateInputValue();
     };
     Searchbox.prototype.onInput = function (_) {
         this.updateInputValue();
+        this.ensureSbHasContent();
         var val = this.getCurrentSbText();
         this.closeList();
         if (!val) {
@@ -75,7 +87,7 @@ var Searchbox = (function () {
         }
         this._currentFocus = -1;
         var _loop_1 = function (possibleValue) {
-            var ourValue = val;
+            var ourValue = val.trim();
             var matchValue = possibleValue;
             if (this_1._lookup[possibleValue].ignoreCase) {
                 ourValue = ourValue.toLowerCase();
@@ -91,6 +103,7 @@ var Searchbox = (function () {
                 entry_1.addEventListener("click", function (_) {
                     that_1.insertValueIntoSb(entry_1);
                     that_1.closeList();
+                    that_1._sb.focus();
                 });
                 this_1._dropDown.appendChild(entry_1);
             }

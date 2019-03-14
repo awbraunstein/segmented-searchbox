@@ -66,6 +66,20 @@ class Searchbox {
     this._el.value = vals.join(' ');
   }
 
+  // If there is no content at the end of the searchbox, we can end up with the
+  // caret outside of the box, which looks very weird. This method makes sure
+  // that there is a text node at the end of the searchbox with a nbsp in it. If
+  // there is no text at all, it works fine though.
+  private ensureSbHasContent() {
+    let len = this._sb.childNodes.length;
+    if (len != 0 && this._sb.childNodes[len - 1].nodeType != 3) {
+      let node = document.createTextNode('\u00a0');
+      this._sb.appendChild(node);
+      this._sb.focus()
+      document.getSelection()!.collapse(node, 1);
+    }
+  }
+
   // Inserts a valid value into the searchbox. This makes that value uneditable
   // and colors it appropriately.
   private insertValueIntoSb(el: HTMLElement) {
@@ -81,13 +95,16 @@ class Searchbox {
         replacement.contentEditable = 'false';
         node.parentNode!.insertBefore(replacement, node);
         node.parentNode!.removeChild(node);
+        this.ensureSbHasContent();
+        this.updateInputValue();
+        return;
       }
     }
-    this.updateInputValue();
   }
 
   private onInput(_: Event) {
     this.updateInputValue();
+    this.ensureSbHasContent();
     let val = this.getCurrentSbText();
     // Close any already open lists of autocompleted values.
     this.closeList();
@@ -100,7 +117,7 @@ class Searchbox {
     this._currentFocus = -1;
     // Check to see which values match the current text value.
     for (let possibleValue in this._lookup) {
-      let ourValue = val;
+      let ourValue = val.trim();
       let matchValue = possibleValue;
       if (this._lookup[possibleValue].ignoreCase) {
         ourValue = ourValue.toLowerCase();
@@ -119,6 +136,7 @@ class Searchbox {
           // insert the value for the autocomplete text field:
           that.insertValueIntoSb(entry);
           that.closeList();
+          that._sb.focus();
         });
         this._dropDown.appendChild(entry);
       }

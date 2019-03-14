@@ -13,6 +13,7 @@ declare class Searchbox {
     private validateConfig;
     private getCurrentSbText;
     private updateInputValue;
+    private ensureSbHasContent;
     private insertValueIntoSb;
     private onInput;
     private onKeydown;
