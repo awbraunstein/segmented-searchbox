@@ -2,7 +2,7 @@
 <html>
     <head>
 	<title>Segmented Searchbox Example</title>
-	<script src="../dist/index.js"></script>
+	<script src="../dist/bundle.js"></script>
 	<link rel="stylesheet" type="text/css" href="../src/style.css">
 	<style>
 	 .control-group {
@@ -19,7 +19,7 @@
 	    <input type="text" id="basic-searchbox" class="demo-default">
 	    <script>
 	     var el = document.getElementById('basic-searchbox');
-	     segmentedSearchbox(el, {
+	     SegmentedSearchbox.initSearchbox(el, {
 		 valueKinds: [
 		     {
 			 name: 'keywords',

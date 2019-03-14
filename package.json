@@ -2,10 +2,11 @@
   "name": "segmented-searchbox",
   "version": "1.0.0",
   "description": "A searchbox that breaks the query into segments based on regex rules. Allows for autocomplete of segments as well.",
-  "main": "./dist/index.ts",
+  "private": true,
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "mocha -r ts-node/register ./test/**/*.ts"
+    "test": "mocha -r ts-node/register ./test/**/*.ts",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,10 @@
     "@types/mocha": "^5.2.6",
     "chai": "^4.2.0",
     "mocha": "^6.0.2",
+    "ts-loader": "^5.3.3",
     "ts-node": "^8.0.3",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
   }
 }

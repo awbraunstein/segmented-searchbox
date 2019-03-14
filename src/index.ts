@@ -73,7 +73,9 @@ class Searchbox {
   private ensureSbHasContent() {
     let len = this._sb.childNodes.length;
     if (len != 0 && this._sb.childNodes[len - 1].nodeType != 3) {
-      let node = document.createTextNode('\u00a0');
+      // String.fromCharCode(160) gets around a bug where webpack/ts-loader
+      // messes with the nbsp literal.
+      let node = document.createTextNode(String.fromCharCode(160));
       this._sb.appendChild(node);
       this._sb.focus()
       document.getSelection()!.collapse(node, 1);
@@ -297,6 +299,6 @@ interface SearchboxConfig {
   valueKinds: ReadonlyArray<ValueKind>;
 }
 
-function segmentedSearchbox(el: HTMLInputElement, config: SearchboxConfig) {
+export function initSearchbox(el: HTMLInputElement, config: SearchboxConfig) {
   SearchboxManager.getInstance().addSearchbox(el, config);
 }
