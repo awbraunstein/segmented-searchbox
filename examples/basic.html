@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+    <head>
+	<title>Segmented Searchbox Example</title>
+	<script src="../dist/index.js"></script>
+	<link rel="stylesheet" type="text/css" href="../src/style.css">
+    </head>
+    <body>
+	<div class="control-group">
+	    <label for="basic-searchbox">Search:</label>
+	    <input type="text" id="basic-searchbox" class="demo-default">
+	    <script>
+	     var el = document.getElementById('basic-searchbox');
+	     segmentedSearchbox(el, {
+		 valueKinds: [
+		     {
+			 name: 'keywords',
+			 color: 'blue',
+			 values: [
+			     {data: 'OR'},
+			     {data: 'AND'},
+			 ]
+		     }, {
+			 name: 'special-character',
+			 color: 'green',
+			 values: [
+			     {data: '('},
+			     {data: ')'}
+			 ]
+		     }, {
+			 name: 'songs',
+			 color: 'red',
+			 values: [
+			     {data: 'you-enjoy-myself',
+			      text: 'You Enjoy Myself'},
+			     {data: 'brian-and-robert',
+			      text: 'Brian and Robert'},
+			     {data: 'reba',
+			      text: 'Reba'}
+			 ]
+		     }
+		 ]
+	     });
+	    </script>
+	</div>
+    </body>
+</html>

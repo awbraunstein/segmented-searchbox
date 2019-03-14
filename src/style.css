@@ -1,0 +1,55 @@
+.segmented-searchbox-input {
+    -moz-appearance: textfield;
+    -webkit-appearance: textfield;
+    background-color: white;
+    background-color: -moz-field;
+    border: 1px solid darkgray;
+    box-shadow: 1px 1px 1px 0 lightgray inset;
+    font: -moz-field;
+    font: -webkit-small-control;
+    margin-top: 5px;
+    padding: 2px 3px;
+    height: 30px;
+    font-size: 30px;
+    width: 398px;
+}
+.segmented-searchbox-container {
+    position: relative;
+    display: inline-block;
+    font-size:
+}
+
+.segmented-searchbox-dropdown {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+}
+
+.segmented-searchbox-dropdown div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+.segmented-searchbox-dropdown div:hover {
+    background-color: #e9e9e9;
+}
+
+.autocomplete-active {
+    background-color: DodgerBlue !important;
+    color: #ffffff;
+}
+
+.segmented-searchbox-valid-item {
+    margin-left: 1px;
+    margin-right: 1px;
+    border-radius: 2px;
+    border-left: 1px;
+    border-right: 1px;
+}
