@@ -11,5 +11,5 @@ interface ValueKind {
 interface SearchboxConfig {
     valueKinds: ReadonlyArray<ValueKind>;
 }
-export declare function initSearchbox(el: HTMLInputElement, config: SearchboxConfig): void;
+export declare function initSearchbox(el: HTMLInputElement, config: SearchboxConfig | string): void;
 export {};

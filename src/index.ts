@@ -183,8 +183,16 @@ class Searchbox {
 
   private onKeydown(e: KeyboardEvent) {
     let entries = this._dropDown.getElementsByTagName("div");
-    // If there are no entries, then don't do anything.
+    // If there are no entries, then don't do anything unless the event was
+    // enter. Then we should submit the form.
     if (!entries.length) {
+      if (e.keyCode == 13) { // ENTER
+        e.preventDefault()
+        let parentForm = this._el.closest('form');
+        if (parentForm) {
+          parentForm.submit();
+        }
+      }
       return;
     }
     if (e.keyCode == 40) { // DOWN
@@ -197,6 +205,8 @@ class Searchbox {
       e.preventDefault();
       if (this._currentFocus > -1) {
         entries[this._currentFocus].click();
+      } else {
+        entries[0].click();
       }
       if (entries.length == 1) {
         entries[0].click();
@@ -253,14 +263,8 @@ class Searchbox {
     this._container.appendChild(this._dropDown);
     this._el.parentNode!.insertBefore(this._container, this._el.nextSibling);
 
-    // Make the searchbox contenteditable.
-    this._sb.contentEditable = 'true';
-
-    this.renderFromInputValue();
-
     this._sb.addEventListener('input', (e) => { this.onInput(e); });
     this._sb.addEventListener('keydown', (e) => { this.onKeydown(e); });
-
   }
 
   // If the input has a value to start with, we should render that first.
@@ -270,16 +274,27 @@ class Searchbox {
       return;
     }
 
+    // There may be collisions so we will pick the shortest text value.
     let reverseLookup: { [value: string]: ReverseLookupValue; } = {};
     for (let text in this._lookup) {
       let lv = this._lookup[text];
+      // If the lookup value is already in the reverse lookup and the lenth of
+      // the text in the lookup value is less than length of the text we are
+      // trying to add, don't overwrite it.
+      if (lv.data in reverseLookup &&
+        reverseLookup[lv.data].text.length < text.length) {
+        continue
+      }
       reverseLookup[lv.data] = {
         color: lv.color,
         text: text
       };
     }
-    let queryPieces = val.split(/\s+/);
+    let queryPieces = val.split(/\s+|([\(\)])/);
     for (let piece of queryPieces) {
+      if (!piece) {
+        continue
+      }
       if (!(piece in reverseLookup)) {
         // This is an error.
         console.log('Query part: ' + piece + ' is invalid.');
@@ -307,13 +322,37 @@ class Searchbox {
     return lookup;
   }
 
-  public constructor(el: HTMLInputElement, config: SearchboxConfig) {
+  private fetchConfig(url: string) {
+    let xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        this.setupWithConfig(xhr.response);
+      }
+    }
+    xhr.open("GET", url);
+    xhr.send()
+  }
+
+  private setupWithConfig(config: SearchboxConfig) {
     if (!this.validateConfig(config)) {
       throw new Error('Config contains duplicate values and is invalid.')
     }
-    this._el = el;
     this._lookup = this.createLookup(config);
+
+    // Make the searchbox contenteditable.
+    this._sb.contentEditable = 'true';
+    this.renderFromInputValue();
+  }
+
+  public constructor(el: HTMLInputElement, config: SearchboxConfig | string) {
+    this._el = el;
     this.setupSearchbox();
+    if (typeof config === 'string') {
+      this.fetchConfig(config);
+    } else {
+      this.setupWithConfig(config)
+    }
   }
 
 }
@@ -332,7 +371,7 @@ class SearchboxManager {
     return SearchboxManager._instance;
   }
 
-  public addSearchbox(el: HTMLInputElement, config: SearchboxConfig) {
+  public addSearchbox(el: HTMLInputElement, config: SearchboxConfig | string) {
     if (!el.id) {
       throw new Error('The provided element must have an id.')
     }
@@ -367,6 +406,6 @@ interface SearchboxConfig {
   valueKinds: ReadonlyArray<ValueKind>;
 }
 
-export function initSearchbox(el: HTMLInputElement, config: SearchboxConfig) {
+export function initSearchbox(el: HTMLInputElement, config: SearchboxConfig | string) {
   SearchboxManager.getInstance().addSearchbox(el, config);
 }
